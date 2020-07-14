@@ -8,13 +8,27 @@
     ** NOTE **
          Version 0.4 should have RGB analog input faders
 */
+
+//Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
+//Pin value holder
+/*
+ * ***break down of pins[4][5] and pins2[4][5]
+   pins[0][0-2] = pin numbers
+   pins[1][0-3] = pin fade value (effects the speed that pins fade
+   pins[2][*] is being replaced by ssdelay. previously held random delay value for pins/ changed how fast pins would fade
+   pins[3][0-3] = pin levels. These hold the initial pin value at first so everything would turn on when first started.
+*/
 int pins[4][5];
 int pins2[4][5];
+//holds what mode is set and helps change behavior of the code when running a specific "mode"
 volatile int mode = 0;
+//used to change speed
 int ssdelay = 0;
+//interupt pin. interupt might be used to turn controller "off" of "on"
 int interpin = 2;
 void setup() {
+  //assign pin numbers
   pins[0][1] = 10;
   pins[0][2] = 11;
   pins[0][3] = 9;
@@ -23,29 +37,39 @@ void setup() {
   pins2[0][3] = 6;
   int x = 6;
   do {
+    //set input pins so we can set mode, color, etc...
     pinMode(analogPins[x], INPUT);
     x--;
   } while (x > 0);
   x = 4;
   do {
+    //asign pin mode (input or output)
+    //for the LED lights setting input then wrighting to the pins makes them "block" power. This causes the lights to "fade"
     pinMode(pins[0][x], INPUT);
     pinMode(pins2[0][x], INPUT);
     x--;
   } while (x > 0);
   x = 4;
   do {
+    //asign random fade value to make it have some variety every time the controler is started
+    // might be removed in later versions or set to a constant
     pins[1][x] = random(1, 5);
     pins2[1][x] = random(1, 5);
     x--;
   } while (x > 0);
   x = 4;
   do {
+    //delay time between operations. Changes speed of fading.
+    //will be removed in later versions, replacing wiht ssdelay
     pins[2][x] = random(50, 75);
     pins2[2][x] = random(50, 75);
     x--;
   } while (x > 0);
   x = 4;
   do {
+    // originally set values to turn everything on when code first started.
+    //small possability of removing this and leaving a note that 255 is max PWM output
+    //
     pins[3][x] = 255;
     pins2[3][x] = 255;
     x--;
@@ -157,10 +181,6 @@ void rAD() {
   if (analogRead(A5) > 190 && analogRead(A5) < 300) {
     mode = 6;
   }
-
-
-  //pin A4 for speed/split color selector
-
 }
 
 //holds a single color for both strips
@@ -458,7 +478,7 @@ void rGBSolidSeperateTwo(int stripSelect) {
 void interFunction() {
   if (mode = ! 7) {
     mode = 7;
-    
+
   }
   if (mode == 7) {
     rAD();
