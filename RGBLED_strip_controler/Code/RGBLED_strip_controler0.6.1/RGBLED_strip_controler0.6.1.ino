@@ -1,14 +1,3 @@
-/*
-   **Changelog 0.4**
-
-   **ToDo**
-          pinFader(){} Now supports mode 5 Split rainbow
-          setup speedStrip for speed select / atrip select
-
-    ** NOTE **
-         Version 0.4 should have RGB analog input faders
-*/
-
 //Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
 //Pin value holder
@@ -74,14 +63,21 @@ void setup() {
     pins2[3][x] = 255;
     x--;
   } while (x > 0);
-
+	//raise value of input for mode
   pinMode(interpin, INPUT_PULLUP);
+  //attach interpin to interupt so signals will stop the current function and run interupt code
   attachInterrupt(digitalPinToInterrupt(interpin), interFunction, LOW);
+  //optional. used for debugging the controler so I know what values to assighn. Same applies to Serial.print methods.
   Serial.begin(19200);
 }
 
 void speedStrip() {
+	//set the delay based on analog input from A4
+	//Do not use the analog input for the delay. delay will not be stable and cannot reach slower speeds.
+	
+	//if in mode 4,5,6 use A4 to set delay that is faster when out of bounds
   if (mode == 4 || mode == 5 || mode == 6) {
+	  //if A4 returns an out of bounds value(not planned) then speed up everything to get next read from input
     if (analogRead(A5) > 268 || analogRead(A5) < 0) {
       ssdelay = 5;
     }
@@ -134,15 +130,19 @@ void speedStrip() {
     if (analogRead(A4) > 290 && analogRead(A4) < 300) {
       ssdelay = 900;
     }
+	
+	//when in mode 4 or 5 speed things up so it looks better
     if (mode == 5 || mode == 4 ) {
       int x = 0;
       do {
+		  //change the 30 to speed up(higher value or slow down(lower value) the fading speed
         ssdelay = ssdelay / 30;
         x++;
       } while (x < 1);
     }
 
   }
+  //when in mode 0,1,2,3 use A4 to change whitch LED strip is controlled
   if (mode == 0 || mode == 1 || mode == 2 || mode == 3 ) {
     if (analogRead(A4) < 125) {
       ssdelay = 1;
@@ -151,10 +151,8 @@ void speedStrip() {
       ssdelay = 2;
     }
   }
-  //Serial.println(ssdelay);
 }
 void rAD() {
-  //analogAverage(pin);
   //catch anything out of bounds for mode select
   if (analogRead(A5) > 300 || analogRead(A5) < 63) {
     mode = 0;
@@ -166,6 +164,7 @@ void rAD() {
   if (analogRead(A5) > 70 && analogRead(A5) < 100) {
     mode = 1;
   }
+  //modes are unused
   //if (analogRead(A5) > 80 && analogRead(A5) < 100) {
   //  mode = 2;
   //}
@@ -185,6 +184,8 @@ void rAD() {
 
 //holds a single color for both strips
 void rGBSolid(int cycleNumber) {
+	//sets values to max value so everything has a base starting point
+	//cycle number is used once per call to set everything to be the same
   if (cycleNumber == 0) {
     int x = 4;
     do {
@@ -208,8 +209,6 @@ void rGBSolid(int cycleNumber) {
   }
   pins[3][1] = average;
   pins2[3][1] = average;
-  // Serial.println(" Average 1 ");
-  //Serial.print(average);
 
   x = 50;
   average = 0;
@@ -227,8 +226,6 @@ void rGBSolid(int cycleNumber) {
   pins[3][2] = average;
   pins2[3][2] = average;
 
-  //Serial.print(" Average 2 ");
-  //Serial.print(average);
 
   x = 50;
   average = 0;
@@ -246,8 +243,6 @@ void rGBSolid(int cycleNumber) {
   pins[3][3] = average;
   pins2[3][3] = average;
 
-  //Serial.print(" Average 3 ");
-  //Serial.print(average);
 
   analogWrite(pins[0][1], pins[3][1]);
   analogWrite(pins[0][2], pins[3][2]);
@@ -258,13 +253,12 @@ void rGBSolid(int cycleNumber) {
 }
 
 //Fade pins to preset value (Rainbow effect)
+//there are two methods for this as the code was not working when only one method was used with an if() statement
 void pinFaderM5(int pin, int value) {
   if (pin == 1 || pin == 2 || pin == 3) {
     if (pins[3][pin] < value) {
       do {
         pins[3][pin] = pins[3][pin] + pins[1][pin];
-        // Serial.print(" Pin 1 increase " );
-        // Serial.println(pin);
         if (pins[3][pin] > 255) {
           pins[3][pin] = 255;
         }
@@ -276,8 +270,6 @@ void pinFaderM5(int pin, int value) {
     if (pins[3][pin] > value) {
       do {
         pins[3][pin] = pins[3][pin] - pins[1][pin];
-        // Serial.print(" Pin 1 decrease " );
-        // Serial.println(pin);
         if (pins[3][pin] < 0 ) {
           pins[3][pin] = 0;
         }
@@ -286,8 +278,6 @@ void pinFaderM5(int pin, int value) {
         delay(ssdelay);
       } while (pins[3][pin] > value);
     }
-    // Serial.println(pin);
-    // Serial.println(" Stuck ");
     if (pin == 4) {
       pin = 1;
     }
@@ -297,11 +287,8 @@ void pinFaderM5(int pin, int value) {
   if (pin == 6) {
     pin = 3;
   }
-  // Serial.println(pin);
   do {
     pins2[3][pin] = pins2[3][pin] + pins2[1][pin];
-    // Serial.print(" Pin 1 " );
-    // Serial.println(pin);
     if (pins2[3][pin] > 255) {
       pins2[3][pin] = 255;
     }
@@ -312,8 +299,6 @@ void pinFaderM5(int pin, int value) {
   if (pins2[3][pin] > value) {
     do {
       pins2[3][pin] = pins2[3][pin] - pins2[1][pin];
-      // Serial.print(" Pin 2 " );
-      //Serial.println(pin);
       if (pins2[3][pin] < 0 ) {
         pins2[3][pin] = 0;
       }
@@ -323,13 +308,13 @@ void pinFaderM5(int pin, int value) {
     } while (pins2[3][pin] > value);
   }
 
-  //Serial.println(" Out ");
 }
+	//used to fade the pins smoothly instead of a "hard" switch
+	//Rainbow
 void pinFader(int pin, int value) {
   if (pins[3][pin] < value) {
     do {
       pins[3][pin] = pins[3][pin] + pins[1][pin];
-      // Serial.println(" Pin 1 increase " );
       if (pins[3][pin] > 255) {
         pins[3][pin] = 255;
       }
@@ -341,7 +326,6 @@ void pinFader(int pin, int value) {
   if (pins[3][pin] > value) {
     do {
       pins[3][pin] = pins[3][pin] - pins[1][pin];
-      // Serial.println(" Pin 1 decrease " );
       if (pins[3][pin] < 0 ) {
         pins[3][pin] = 0;
       }
@@ -352,7 +336,6 @@ void pinFader(int pin, int value) {
   }
   do {
     pins2[3][pin] = pins2[3][pin] + pins2[1][pin];
-    //Serial.println(" Pin 2 increase " );
     if (pins2[3][pin] > 255) {
       pins2[3][pin] = 255;
     }
@@ -363,7 +346,6 @@ void pinFader(int pin, int value) {
   if (pins2[3][pin] > value) {
     do {
       pins2[3][pin] = pins2[3][pin] - pins2[1][pin];
-      // Serial.println(" Pin 2 decrease " );
       if (pins2[3][pin] < 0 ) {
         pins2[3][pin] = 0;
       }
@@ -376,6 +358,7 @@ void pinFader(int pin, int value) {
 }
 
 //can change both(linked) LED strip colors given a selector
+//method has been devided for each strip to to code not working when one method was used with an if() statement
 void rGBSolidSeperateOne(int stripSelect) {
 
   int x = 50;
@@ -475,6 +458,8 @@ void rGBSolidSeperateTwo(int stripSelect) {
   speedStrip();
   pins2[3][3] = average;
 }
+
+//this is the interupt function called by D2 when signal is received
 void interFunction() {
   if (mode = ! 7) {
     mode = 7;
@@ -483,6 +468,7 @@ void interFunction() {
   if (mode == 7) {
     rAD();
   }
+  //report an interupt and turn off the lights
   Serial.println(" Interupt ");
   Serial.print(digitalRead(A2));
   analogWrite(11, 255);
@@ -493,6 +479,7 @@ void interFunction() {
   analogWrite(6, 255);
 }
 //Main loop to chose mode behavor
+//speedStrip is called often to set the speed at any given point
 void loop() {
 
   Serial.println(" ");
@@ -514,14 +501,18 @@ void loop() {
   Serial.print( mode);
   Serial.print(" interpin ");
   Serial.println(digitalRead(interpin));
+  
+  //call for mode selection
   rAD();
   if (mode == 7) {
     delay(2000);
   }
-
+	//mode 0 sets both strips to one selectable color
   if (mode == 0) {
     rGBSolid(0);
   }
+  // allows both strips to be a differant color
+  //will be changed for Christmas setup with a fpuntain and only one LED strip
   if (mode == 1) {
     speedStrip();
     if (ssdelay == 1) {
@@ -530,11 +521,13 @@ void loop() {
     if (ssdelay == 2) {
       rGBSolidSeperateTwo(ssdelay);
     }
-
+	
+	//pins did not set value when this was in function above. put it here to fix
     analogWrite(pins2[0][1], pins2[3][1]);
     analogWrite(pins2[0][2], pins2[3][2]);
     analogWrite(pins2[0][3], pins2[3][3]);
   }
+  //modes two and three are not used yet
   if (mode == 2) {
 
   }
@@ -570,6 +563,8 @@ void loop() {
   }
 
   if (mode == 5) {
+	  //Dual rainbow. 
+	  //Both LED strips are using the rainbow mode but are differant colors
     pinFaderM5(1, 0); //Red
     speedStrip();
     pinFaderM5(4, 255); //Red
