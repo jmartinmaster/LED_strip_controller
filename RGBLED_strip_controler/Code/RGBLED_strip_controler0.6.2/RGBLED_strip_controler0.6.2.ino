@@ -1,3 +1,7 @@
+
+//porting code to a fork as this code is for two LED strips.
+//7/14/2020
+
 //Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
 //Pin value holder
