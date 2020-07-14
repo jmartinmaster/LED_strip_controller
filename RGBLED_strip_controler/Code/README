@@ -1,3 +1,4 @@
-This code is for a LED light strip controler with two outputs. 
+This code is for a LED light strip controler with three outputs.
+One for an RGB LED strip, one for a bi-directional LED strip, and one for a water fountain.
 Changelogs within the files may not be accurate. I'll make a changelog folder for tracking.
 This code is under development. There are going to be many changes to it.
