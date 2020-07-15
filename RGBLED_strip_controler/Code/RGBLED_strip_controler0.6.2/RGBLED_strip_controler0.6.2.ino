@@ -1,7 +1,3 @@
-
-//porting code to a fork as this code is for two LED strips.
-//7/14/2020
-
 //Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
 //Pin value holder
@@ -20,6 +16,8 @@ volatile int mode = 0;
 int ssdelay = 0;
 //interupt pin. interupt might be used to turn controller "off" of "on"
 int interpin = 2;
+//Pin controling the fountain's power
+int fountinpin = 13;
 void setup() {
   //assign pin numbers
   pins[0][1] = 10;
@@ -67,7 +65,7 @@ void setup() {
     pins2[3][x] = 255;
     x--;
   } while (x > 0);
-	//raise value of input for mode
+  //raise value of input for mode
   pinMode(interpin, INPUT_PULLUP);
   //attach interpin to interupt so signals will stop the current function and run interupt code
   attachInterrupt(digitalPinToInterrupt(interpin), interFunction, LOW);
@@ -76,12 +74,12 @@ void setup() {
 }
 
 void speedStrip() {
-	//set the delay based on analog input from A4
-	//Do not use the analog input for the delay. delay will not be stable and cannot reach slower speeds.
-	
-	//if in mode 4,5,6 use A4 to set delay that is faster when out of bounds
+  //set the delay based on analog input from A4
+  //Do not use the analog input for the delay. delay will not be stable and cannot reach slower speeds.
+
+  //if in mode 4,5,6 use A4 to set delay that is faster when out of bounds
   if (mode == 4 || mode == 5 || mode == 6) {
-	  //if A4 returns an out of bounds value(not planned) then speed up everything to get next read from input
+    //if A4 returns an out of bounds value(not planned) then speed up everything to get next read from input
     if (analogRead(A5) > 268 || analogRead(A5) < 0) {
       ssdelay = 5;
     }
@@ -134,12 +132,12 @@ void speedStrip() {
     if (analogRead(A4) > 290 && analogRead(A4) < 300) {
       ssdelay = 900;
     }
-	
-	//when in mode 4 or 5 speed things up so it looks better
+
+    //when in mode 4 or 5 speed things up so it looks better
     if (mode == 5 || mode == 4 ) {
       int x = 0;
       do {
-		  //change the 30 to speed up(higher value or slow down(lower value) the fading speed
+        //change the 30 to speed up(higher value or slow down(lower value) the fading speed
         ssdelay = ssdelay / 30;
         x++;
       } while (x < 1);
@@ -168,13 +166,14 @@ void rAD() {
   if (analogRead(A5) > 70 && analogRead(A5) < 100) {
     mode = 1;
   }
-  //modes are unused
-  //if (analogRead(A5) > 80 && analogRead(A5) < 100) {
-  //  mode = 2;
-  //}
-  //if (analogRead(A5) > 100 && analogRead(A5) < 120) {
-  //  mode = 3;
-  //}
+  /*modes are unused
+    if (analogRead(A5) > 80 && analogRead(A5) < 100) {
+     mode = 2;
+    }
+    if (analogRead(A5) > 100 && analogRead(A5) < 120) {
+    mode = 3;
+    }
+  */
   if (analogRead(A5) > 100 && analogRead(A5) < 150) {
     mode = 4;
   }
@@ -188,8 +187,8 @@ void rAD() {
 
 //holds a single color for both strips
 void rGBSolid(int cycleNumber) {
-	//sets values to max value so everything has a base starting point
-	//cycle number is used once per call to set everything to be the same
+  //sets values to max value so everything has a base starting point
+  //cycle number is used once per call to set everything to be the same
   if (cycleNumber == 0) {
     int x = 4;
     do {
@@ -313,8 +312,8 @@ void pinFaderM5(int pin, int value) {
   }
 
 }
-	//used to fade the pins smoothly instead of a "hard" switch
-	//Rainbow
+//used to fade the pins smoothly instead of a "hard" switch
+//Rainbow
 void pinFader(int pin, int value) {
   if (pins[3][pin] < value) {
     do {
@@ -482,10 +481,73 @@ void interFunction() {
   analogWrite(9, 255);
   analogWrite(6, 255);
 }
+
+void houseLights( int pin, int value) {
+  /*used to control the lights in the houses
+    The lights are bi-directional so there are three outputs
+    Having one line on will activate the other half the lights
+
+    house lights are on pins 3,5,6
+    equivalant to pins2[0][0-2]
+
+  */
+
+  if (pins2[3][pin] < value) {
+    do {
+      pins2[3][pin] = pins2[3][pin] + pins2[1][pin];
+      if (pins2[3][pin] > 255) {
+        pins2[3][pin] = 255;
+      }
+      analogWrite(pins2[0][pin], pins2[3][pin]);
+      speedStrip();
+      delay(ssdelay);
+    } while (pins2[3][pin] < value);
+  }
+  if (pins2[3][pin] > value) {
+    do {
+      pins2[3][pin] = pins2[3][pin] - pins2[1][pin];
+      if (pins2[3][pin] < 0 ) {
+        pins2[3][pin] = 0;
+      }
+      analogWrite(pins2[0][pin], pins2[3][pin]);
+      speedStrip();
+      delay(ssdelay);
+    } while (pins2[3][pin] > value);
+  }
+
+  /*
+    The nex if statements watch for invalid pin settings
+    If two are at full value the remaining one is turned off.
+  */
+  if (pins2[3][0] > 254 && pins2[3][1] > 254) {
+    pins2[3][2] = 0;
+    analogWrite(pins2[0][2], pions2[3][2]);
+  }
+  if (pins2[3][1] > 254 && pins2[3][2] > 254) {
+    pins2[3][0] = 0;
+    analogWrite(pins2[0][0], pions2[3][0]);
+  }
+  if (pins2[3][0] > 254 && pins2[3][2] > 254) {
+    pins2[3][1] = 0;
+    analogWrite(pins2[0][1], pions2[3][1]);
+  }
+
+}
+
+//Controls the TIP120 connected to the fountain. value is on or off.
+void fountain() {
+  if (digitalRead(fountinpin) == 1) {
+    digitalWrite(fountinpin, LOW);
+  }
+  if (digitalRead(fountinpin) == 0) {
+    digitalWrite(fountinpin, HIGH);
+  }
+
+}
 //Main loop to chose mode behavor
 //speedStrip is called often to set the speed at any given point
 void loop() {
-
+  //Diagnostic data for checking values on pins A0-A5
   Serial.println(" ");
   Serial.print(" A0 " );
   Serial.print(analogRead(A0));
@@ -505,13 +567,17 @@ void loop() {
   Serial.print( mode);
   Serial.print(" interpin ");
   Serial.println(digitalRead(interpin));
-  
+
+  //House lights need to be called in every mode.
+  //House lights should "ping" from one side to the other.
+
+
   //call for mode selection
   rAD();
   if (mode == 7) {
     delay(2000);
   }
-	//mode 0 sets both strips to one selectable color
+  //mode 0 sets both strips to one selectable color
   if (mode == 0) {
     rGBSolid(0);
   }
@@ -525,8 +591,8 @@ void loop() {
     if (ssdelay == 2) {
       rGBSolidSeperateTwo(ssdelay);
     }
-	
-	//pins did not set value when this was in function above. put it here to fix
+
+    //pins did not set value when this was in function above. put it here to fix
     analogWrite(pins2[0][1], pins2[3][1]);
     analogWrite(pins2[0][2], pins2[3][2]);
     analogWrite(pins2[0][3], pins2[3][3]);
@@ -567,8 +633,8 @@ void loop() {
   }
 
   if (mode == 5) {
-	  //Dual rainbow. 
-	  //Both LED strips are using the rainbow mode but are differant colors
+    //Dual rainbow.
+    //Both LED strips are using the rainbow mode but are differant colors
     pinFaderM5(1, 0); //Red
     speedStrip();
     pinFaderM5(4, 255); //Red
