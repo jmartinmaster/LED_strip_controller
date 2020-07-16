@@ -1,0 +1,113 @@
+EESchema Schematic File Version 4
+EELAYER 30 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L MCU_Microchip_ATmega:ATmega328P-PU U?
+U 1 1 5F0F2B2C
+P 1500 2900
+F 0 "U?" H 856 2946 50  0000 R CNN
+F 1 "ATmega328P-PU" H 856 2855 50  0000 R CNN
+F 2 "Package_DIP:DIP-28_W7.62mm" H 1500 2900 50  0001 C CIN
+F 3 "http://ww1.microchip.com/downloads/en/DeviceDoc/ATmega328_P%20AVR%20MCU%20with%20picoPower%20Technology%20Data%20Sheet%2040001984A.pdf" H 1500 2900 50  0001 C CNN
+	1    1500 2900
+	1    0    0    -1  
+$EndComp
+$Comp
+L CRYSTAL:CRYSTAL X?
+U 1 1 5F0F7EA6
+P 2500 2350
+F 0 "X?" V 2530 2272 30  0000 R CNN
+F 1 "CRYSTAL" V 2470 2272 30  0000 R CNN
+F 2 "" H 2500 2350 60  0000 C CNN
+F 3 "" H 2500 2350 60  0000 C CNN
+	1    2500 2350
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 5F0FA514
+P 2850 2200
+F 0 "C?" V 2621 2200 50  0000 C CNN
+F 1 "C_Small" V 2712 2200 50  0000 C CNN
+F 2 "" H 2850 2200 50  0001 C CNN
+F 3 "~" H 2850 2200 50  0001 C CNN
+	1    2850 2200
+	0    1    1    0   
+$EndComp
+$Comp
+L Device:C_Small C?
+U 1 1 5F0FB0BE
+P 2850 2500
+F 0 "C?" V 2621 2500 50  0000 C CNN
+F 1 "C_Small" V 2712 2500 50  0000 C CNN
+F 2 "" H 2850 2500 50  0001 C CNN
+F 3 "~" H 2850 2500 50  0001 C CNN
+	1    2850 2500
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	2500 2200 2750 2200
+Wire Wire Line
+	2500 2500 2750 2500
+Wire Wire Line
+	2500 2500 2100 2500
+Wire Wire Line
+	2100 2500 2100 2400
+Connection ~ 2500 2500
+Wire Wire Line
+	2500 2200 2300 2200
+Wire Wire Line
+	2300 2200 2300 2300
+Wire Wire Line
+	2300 2300 2100 2300
+Connection ~ 2500 2200
+Wire Wire Line
+	2950 2200 2950 2500
+Wire Wire Line
+	2950 2500 2950 4400
+Wire Wire Line
+	2950 4400 1500 4400
+Connection ~ 2950 2500
+Wire Wire Line
+	1600 1400 1500 1400
+$Comp
+L +5V:+5V #PWR?
+U 1 1 5F0FD6CA
+P 1500 900
+F 0 "#PWR?" H 1500 990 20  0001 C CNN
+F 1 "+5V" H 1496 1028 30  0000 C CNN
+F 2 "" H 1500 900 60  0000 C CNN
+F 3 "" H 1500 900 60  0000 C CNN
+	1    1500 900 
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1500 900  1500 1400
+Connection ~ 1500 1400
+Wire Wire Line
+	1500 4400 1500 4800
+Connection ~ 1500 4400
+$Comp
+L power:GND #PWR?
+U 1 1 5F0FEE6E
+P 1500 4800
+F 0 "#PWR?" H 1500 4800 30  0001 C CNN
+F 1 "GND" H 1500 4730 30  0001 C CNN
+F 2 "" H 1500 4800 60  0000 C CNN
+F 3 "" H 1500 4800 60  0000 C CNN
+	1    1500 4800
+	1    0    0    -1  
+$EndComp
+$EndSCHEMATC

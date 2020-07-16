@@ -1,0 +1,57 @@
+***Changlog for RGBLED_strip_controler*.*.****
+
+0.0
+Initial set up
+added pin array [pins[]]
+added fade array [pfade[]]
+added delay array [pdelay[]]
+added value array [pvalue[]]
+added analog pin array [analogPins[]]
+added analog value array [analogvalue[]]
+added mode holder [mode]
+added analog score array [analogScore[]]
+added analog average array [analogAveragev[]]
+added functions
+	-setup()
+	-readAnalogDecode(int pin)
+	-cob()
+	-analogAverage(int pin)
+	-pinfader(int pin)
+	-pinSet()
+	-printAnalog()
+	-loop()
+0.1
+changed pfade[] to pinFV[]
+changed pdelay[] to pinDelay[]
+changed pvalue[] to pinV[]
+Adjusted loop behavior
+0.2
+pins[], pinFV[], pinV[], pinDelay[] moved to pins[][];
+changed readAnalogDecode() to rAD();
+altered the rainbow (mode 0) if(){} statement;
+0.3
+Setup a catch method
+Setup analogAverage(aA(){})
+Setup additional analog input for delays/speed control
+0.4
+pinFader(){} Now supports mode 5 Split rainbow
+setup speedStrip() for speed select / atrip select
+removed cob()
+0.5
+adjusted speedStrip()
+split RGBSolidSeperate into RGBSolidSeperateOne() and RGBSolidSeperateTwo
+	-funtion was not working when trying to control both strips at the same time
+adjusted loop()
+0.6
+added pinFaderM5() due to issues fading pins in mode 5
+removed unused Serial.print methods
+0.6.1
+changed int mode to volatile int mode for use in interupt
+added interupt from pin 2
+added interFunction() for use when pin two receives a HIGH signal
+commented out modes 2 and 3 in loop and rAD()as they are not used
+added anotations
+0.6.2
+added int fountinpin = 13
+added houseLights(int pin, int value)
+added fountain() for on/off control of a water fountain attached to pin 13
