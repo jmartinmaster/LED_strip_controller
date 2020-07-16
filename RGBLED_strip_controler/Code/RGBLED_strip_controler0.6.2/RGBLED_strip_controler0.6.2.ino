@@ -1,13 +1,6 @@
 //Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
-//Pin value holder
-/*
- * ***break down of pins[4][5] and pins2[4][5]
-   pins[0][0-2] = pin numbers
-   pins[1][0-3] = pin fade value (effects the speed that pins fade
-   pins[2][*] is being replaced by ssdelay. previously held random delay value for pins/ changed how fast pins would fade
-   pins[3][0-3] = pin levels. These hold the initial pin value at first so everything would turn on when first started.
-*/
+
 int pins[4][5];
 int pins2[4][5];
 //holds what mode is set and helps change behavior of the code when running a specific "mode"
@@ -521,15 +514,15 @@ void houseLights( int pin, int value) {
   */
   if (pins2[3][0] > 254 && pins2[3][1] > 254) {
     pins2[3][2] = 0;
-    analogWrite(pins2[0][2], pions2[3][2]);
+    analogWrite(pins2[0][2], pins2[3][2]);
   }
   if (pins2[3][1] > 254 && pins2[3][2] > 254) {
     pins2[3][0] = 0;
-    analogWrite(pins2[0][0], pions2[3][0]);
+    analogWrite(pins2[0][0], pins2[3][0]);
   }
   if (pins2[3][0] > 254 && pins2[3][2] > 254) {
     pins2[3][1] = 0;
-    analogWrite(pins2[0][1], pions2[3][1]);
+    analogWrite(pins2[0][1], pins2[3][1]);
   }
 
 }
