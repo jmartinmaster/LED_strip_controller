@@ -1,16 +1,29 @@
 //Read from these pins to set speed, brightness,mode and/or color
 int analogPins[6] = {A0, A1, A2, A3, A4, A5};
-
+/*
+  ***break down of pins[4][5] and pins2[4][5]
+   pins[0][0-2] = pin numbers
+   pins[1][0-3] = pin fade value (effects the speed that pins fade
+   pins[2][*] is being replaced by ssdelay. previously held random delay value for pins/ changed how fast pins would fade
+   pins[3][0-3] = pin levels. These hold the initial pin value at first so everything would turn on when first started.
+*/
 int pins[4][5];
 int pins2[4][5];
 //holds what mode is set and helps change behavior of the code when running a specific "mode"
-volatile int mode = 0;
+int mode = 0;
 //used to change speed
 int ssdelay = 0;
 //interupt pin. interupt might be used to turn controller "off" of "on"
 int interpin = 2;
+//Change to interupt funtions to assighn 1 or 0 when differant combination of pins reads as 1 and check for if main loop has ran
+volatile int buttonPress = 0;
+volatile int buttonPress2 = 0;
+volatile int looped = 1;
+volatile int tmp = 0;
 //Pin controling the fountain's power
 int fountinpin = 13;
+
+
 void setup() {
   //assign pin numbers
   pins[0][1] = 10;
@@ -59,9 +72,11 @@ void setup() {
     x--;
   } while (x > 0);
   //raise value of input for mode
-  pinMode(interpin, INPUT_PULLUP);
+  pinMode(interpin, INPUT);
   //attach interpin to interupt so signals will stop the current function and run interupt code
-  attachInterrupt(digitalPinToInterrupt(interpin), interFunction, LOW);
+  attachInterrupt(digitalPinToInterrupt(interpin), interFunction, CHANGE);
+  //second button setup
+  pinMode(12, INPUT);
   //optional. used for debugging the controler so I know what values to assighn. Same applies to Serial.print methods.
   Serial.begin(19200);
 }
@@ -73,56 +88,56 @@ void speedStrip() {
   //if in mode 4,5,6 use A4 to set delay that is faster when out of bounds
   if (mode == 4 || mode == 5 || mode == 6) {
     //if A4 returns an out of bounds value(not planned) then speed up everything to get next read from input
-    if (analogRead(A5) > 268 || analogRead(A5) < 0) {
+    if (analogRead(analogPins[4]) > 268 || analogRead(analogPins[4]) < 0) {
       ssdelay = 5;
     }
     //Set the mode based on analog read from pin 5
-    if (analogRead(A4) > 0 && analogRead(A4) < 20) {
+    if (analogRead(analogPins[4]) > 0 && analogRead(analogPins[4]) < 20) {
       ssdelay = 20;
     }
-    if (analogRead(A4) > 20 && analogRead(A4) < 30) {
+    if (analogRead(analogPins[4]) > 20 && analogRead(analogPins[4]) < 30) {
       ssdelay = 70;
     }
-    if (analogRead(A4) > 30 && analogRead(A4) < 40) {
+    if (analogRead(analogPins[4]) > 30 && analogRead(analogPins[4]) < 40) {
       ssdelay = 80;
     }
-    if (analogRead(A4) > 40 && analogRead(A4) < 60) {
+    if (analogRead(analogPins[4]) > 40 && analogRead(analogPins[4]) < 60) {
       ssdelay = 100;
     }
-    if (analogRead(A4) > 60 && analogRead(A4) < 80) {
+    if (analogRead(analogPins[4]) > 60 && analogRead(analogPins[4]) < 80) {
       ssdelay = 130;
     }
-    if (analogRead(A4) > 80 && analogRead(A4) < 100) {
+    if (analogRead(analogPins[4]) > 80 && analogRead(analogPins[4]) < 100) {
       ssdelay = 160;
     }
-    if (analogRead(A4) > 100 && analogRead(A4) < 120) {
+    if (analogRead(analogPins[4]) > 100 && analogRead(analogPins[4]) < 120) {
       ssdelay = 200;
     }
-    if (analogRead(A4) > 120 && analogRead(A4) < 140) {
+    if (analogRead(analogPins[4]) > 120 && analogRead(analogPins[4]) < 140) {
       ssdelay = 250;
     }
-    if (analogRead(A4) > 140 && analogRead(A4) < 160) {
+    if (analogRead(analogPins[4]) > 140 && analogRead(analogPins[4]) < 160) {
       ssdelay = 300;
     }
-    if (analogRead(A4) > 160 && analogRead(A4) < 190) {
+    if (analogRead(analogPins[4]) > 160 && analogRead(analogPins[4]) < 190) {
       ssdelay = 350;
     }
-    if (analogRead(A4) > 190 && analogRead(A4) < 220) {
+    if (analogRead(analogPins[4]) > 190 && analogRead(analogPins[4]) < 220) {
       ssdelay = 400;
     }
-    if (analogRead(A4) > 220 && analogRead(A4) < 240) {
+    if (analogRead(analogPins[4]) > 220 && analogRead(analogPins[4]) < 240) {
       ssdelay = 600;
     }
-    if (analogRead(A4) > 240 && analogRead(A4) < 268) {
+    if (analogRead(analogPins[4]) > 240 && analogRead(analogPins[4]) < 268) {
       ssdelay = 800;
     }
-    if (analogRead(A4) > 268 && analogRead(A4) < 280) {
+    if (analogRead(analogPins[4]) > 268 && analogRead(analogPins[4]) < 280) {
       ssdelay = 850;
     }
-    if (analogRead(A4) > 280 && analogRead(A4) < 290) {
+    if (analogRead(analogPins[4]) > 280 && analogRead(analogPins[4]) < 290) {
       ssdelay = 875;
     }
-    if (analogRead(A4) > 290 && analogRead(A4) < 300) {
+    if (analogRead(analogPins[4]) > 290 && analogRead(analogPins[4]) < 300) {
       ssdelay = 900;
     }
 
@@ -139,41 +154,41 @@ void speedStrip() {
   }
   //when in mode 0,1,2,3 use A4 to change whitch LED strip is controlled
   if (mode == 0 || mode == 1 || mode == 2 || mode == 3 ) {
-    if (analogRead(A4) < 125) {
+    if (analogRead(analogPins[4]) < 125) {
       ssdelay = 1;
     }
-    if (analogRead(A4) > 125) {
+    if (analogRead(analogPins[4]) > 125) {
       ssdelay = 2;
     }
   }
 }
 void rAD() {
   //catch anything out of bounds for mode select
-  if (analogRead(A5) > 300 || analogRead(A5) < 63) {
+  if (analogRead(analogPins[5]) > 300 || analogRead(analogPins[5]) < 63) {
     mode = 0;
   }
   //Set the mode based on analog read from pin 5
-  if (analogRead(A5) > 24 && analogRead(A5) < 70) {
+  if (analogRead(analogPins[5]) > 24 && analogRead(analogPins[5]) < 70) {
     mode = 0;
   }
-  if (analogRead(A5) > 70 && analogRead(A5) < 100) {
+  if (analogRead(analogPins[5]) > 70 && analogRead(analogPins[5]) < 100) {
     mode = 1;
   }
   /*modes are unused
-    if (analogRead(A5) > 80 && analogRead(A5) < 100) {
+    if (analogRead(analogPins[5]) > 80 && analogRead(analogPins[5]) < 100) {
      mode = 2;
     }
-    if (analogRead(A5) > 100 && analogRead(A5) < 120) {
+    if (analogRead(analogPins[5]) > 100 && analogRead(analogPins[5]) < 120) {
     mode = 3;
     }
   */
-  if (analogRead(A5) > 100 && analogRead(A5) < 150) {
+  if (analogRead(analogPins[5]) > 100 && analogRead(analogPins[5]) < 150) {
     mode = 4;
   }
-  if (analogRead(A5) > 150 && analogRead(A5) < 190) {
+  if (analogRead(analogPins[5]) > 150 && analogRead(analogPins[5]) < 190) {
     mode = 5;
   }
-  if (analogRead(A5) > 190 && analogRead(A5) < 300) {
+  if (analogRead(analogPins[5]) > 190 && analogRead(analogPins[5]) < 300) {
     mode = 6;
   }
 }
@@ -193,7 +208,7 @@ void rGBSolid(int cycleNumber) {
   int x = 50;
   int average = 0;
   do {
-    average = average + analogRead(A0);
+    average = average + analogRead(analogPins[0]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -209,7 +224,7 @@ void rGBSolid(int cycleNumber) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A1);
+    average = average + analogRead(analogPins[1]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -226,7 +241,7 @@ void rGBSolid(int cycleNumber) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A2);
+    average = average + analogRead(analogPins[2]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -360,7 +375,7 @@ void rGBSolidSeperateOne(int stripSelect) {
   int x = 50;
   int average = 0;
   do {
-    average = average + analogRead(A0);
+    average = average + analogRead(analogPins[0]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -375,7 +390,7 @@ void rGBSolidSeperateOne(int stripSelect) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A1);
+    average = average + analogRead(analogPins[1]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -390,7 +405,7 @@ void rGBSolidSeperateOne(int stripSelect) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A2);
+    average = average + analogRead(analogPins[2]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -411,7 +426,7 @@ void rGBSolidSeperateTwo(int stripSelect) {
   int x = 50;
   int average = 0;
   do {
-    average = average + analogRead(A0);
+    average = average + analogRead(analogPins[0]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -426,7 +441,7 @@ void rGBSolidSeperateTwo(int stripSelect) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A1);
+    average = average + analogRead(analogPins[1]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -441,7 +456,7 @@ void rGBSolidSeperateTwo(int stripSelect) {
   x = 50;
   average = 0;
   do {
-    average = average + analogRead(A2);
+    average = average + analogRead(analogPins[2]);
     x--;
   } while (x > 0);
   average = average / 50;
@@ -457,22 +472,13 @@ void rGBSolidSeperateTwo(int stripSelect) {
 
 //this is the interupt function called by D2 when signal is received
 void interFunction() {
-  if (mode = ! 7) {
-    mode = 7;
-
-  }
-  if (mode == 7) {
-    rAD();
-  }
-  //report an interupt and turn off the lights
-  Serial.println(" Interupt ");
-  Serial.print(digitalRead(A2));
-  analogWrite(11, 255);
-  analogWrite(3, 255);
-  analogWrite(10, 255);
-  analogWrite(5, 255);
-  analogWrite(9, 255);
-  analogWrite(6, 255);
+  if(digitalRead(12)== 1){
+    buttonPress2=1;
+    Serial.println(digitalRead(12));
+    }
+  Serial.println("interupt");
+  if (digitalRead(12)== 0 && buttonPress2==0){buttonPress = 1;}
+  Serial.println("button pressed");
 }
 
 void houseLights( int pin, int value) {
@@ -540,20 +546,34 @@ void fountain() {
 //Main loop to chose mode behavor
 //speedStrip is called often to set the speed at any given point
 void loop() {
+  if (looped =! 1) {
+    looped = 1;
+  }
+  if (buttonPress == 1 && buttonPress2 == 0) {
+    fountain();
+    Serial.println("button has been pressed now waiting");
+    delay(3000);
+    buttonPress = 0;
+  }
+  if (buttonPress2 == 1) {
+    Serial.println("button 2 has been pressed now waiting");
+    delay(3000);
+    buttonPress2 = 0;
+  }
   //Diagnostic data for checking values on pins A0-A5
   Serial.println(" ");
   Serial.print(" A0 " );
-  Serial.print(analogRead(A0));
+  Serial.print(analogRead(analogPins[0]));
   Serial.print(" A1 " );
-  Serial.print(analogRead(A1));
+  Serial.print(analogRead(analogPins[1]));
   Serial.print(" A2 " );
-  Serial.print(analogRead(A2));
+  Serial.print(analogRead(analogPins[2]));
   Serial.print(" A3 " );
-  Serial.print(analogRead(A3));
+  Serial.print(analogRead(analogPins[3]));
   Serial.print(" A4 " );
-  Serial.print(analogRead(A4));
+  Serial.print(analogRead(analogPins[4]));
   Serial.print(" A5 " );
-  Serial.print(analogRead(A5));
+  Serial.print(analogRead(analogPins[5]));
   Serial.print( " ssdelay ");
   Serial.print(ssdelay);
   Serial.print(" mode " );
