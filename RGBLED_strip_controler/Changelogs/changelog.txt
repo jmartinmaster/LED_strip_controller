@@ -55,3 +55,7 @@ added anotations
 added int fountinpin = 13
 added houseLights(int pin, int value)
 added fountain() for on/off control of a water fountain attached to pin 13
+0.7
+adjusted values for houseLights
+adjusted behavior from pressing button 2
+adjusted all modes to accomidate One RGBLed strip, one bi-directional LED String and a fountian
