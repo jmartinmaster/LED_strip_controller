@@ -1,0 +1,17 @@
+"Id";"Designator";"Package";"Quantity";"Designation";"Supplier and ref";
+1;"J4";"PinHeader_1x04_P1.27mm_Vertical";1;"Conn_01x03_Male";;;
+2;"U2";"TO-220-3_Vertical";1;"L7805";;;
+3;"R2";"R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical";1;"4.7K";;;
+4;"Q1";"TO-220-3_Vertical";1;"TIP120";;;
+5;"J3";"PinHeader_1x02_P1.27mm_Vertical";1;"Fountain";;;
+6;"C4";"CP_Radial_D4.0mm_P2.00mm";1;"0.1uf";;;
+7;"C3";"CP_Radial_D4.0mm_P2.00mm";1;"0.22uf";;;
+8;"RV4,RV3,RV2,RV1";"Potentiometer_Bourns_3296W_Vertical";4;"R_POT_TRIM_10K";;;
+9;"SW2,SW1";"SW_MEC_5GTH9";2;"SW_MEC_5G";;;
+10;"D1";"D_DO-34_SOD68_P2.54mm_Vertical_AnodeUp";1;"D";;;
+11;"R1";"R_Axial_DIN0204_L3.6mm_D1.6mm_P2.54mm_Vertical";1;"10K";;;
+12;"J2";"PinHeader_1x04_P1.00mm_Vertical";1;"LEDString";;;
+13;"J1";"PinHeader_1x04_P1.00mm_Vertical";1;"LEDStrip";;;
+14;"X1";"Crystal_HC18-U_Vertical";1;"16MHz";;;
+15;"C2,C1";"C_Disc_D3.0mm_W1.6mm_P2.50mm";2;"22pf";;;
+16;"U1";"DIP-28_W7.62mm";1;"ATmega328P-PU";;;
