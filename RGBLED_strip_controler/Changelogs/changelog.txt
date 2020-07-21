@@ -1,5 +1,4 @@
 ***Changlog for RGBLED_strip_controler*.*.****
-
 0.0
 Initial set up
 added pin array [pins[]]
@@ -57,5 +56,11 @@ added houseLights(int pin, int value)
 added fountain() for on/off control of a water fountain attached to pin 13
 0.7
 adjusted values for houseLights
-adjusted behavior from pressing button 2
-adjusted all modes to accomidate One RGBLed strip, one bi-directional LED String and a fountian
+adjusted behavior from pressing button 2 adjusted all modes to accomidate One RGBLed strip, one bi-directional LED String and a fountian
+0.7.2
+Switched main loop to use switch/case
+Adjusting behavior of LED String
+Added aHouseLighing() for automatic fading of house lights in case 0(Single color for LED strip)
+Removed houseLighting()
+Reactivated interupt from pin D2 so as to test functionality during operation
+Removed extra white space
