@@ -90,7 +90,7 @@ void speedStrip() {
     }
     //Set the mode based on analog read from pin 5
     if (analogRead(analogPins[4]) > 0 && analogRead(analogPins[4]) < 20) {
-      ssdelay = 20;
+      ssdelay = 10;
     }
     if (analogRead(analogPins[4]) > 20 && analogRead(analogPins[4]) < 30) {
       ssdelay = 70;
@@ -193,8 +193,18 @@ void aHouseLighting() {
   switch (housePhase) {
     case 1:
       pinFader(0,0,1,255);     
+      pinFader(0,255,2,0);     
+      pinFader(0,0,3,0);
+      pinFader(0,255,1,0);     
+      pinFader(0,255,2,0);     
+      pinFader(0,0,3,255);
+      pinFader(0,255,1,0);  
+      pinFader(0,0,2,255);     
+      pinFader(0,255,3,0);
+      pinFader(0,0,2,0); 
+      pinFader(0,255,1,255);     
       pinFader(0,0,2,0);     
-      pinFader(0,0,3,0);     
+      pinFader(0,255,3,255);
       break;
     case 2:
       pinFader(0,0,1,0);     
@@ -313,7 +323,6 @@ void pinFader(int pin, int value, int houseLine, int value2) {
     do {
       pins[3][pin] = pins[3][pin] - pins[1][pin];
       houseLights[3][houseLine] = houseLights[3][houseLine] + houseLights[1][houseLine];
-      //catch if above 255 (full PWM signal)
       if (pins[3][pin] < 0) {
         pins[3][pin] = 0;
       }
@@ -331,7 +340,6 @@ void pinFader(int pin, int value, int houseLine, int value2) {
     do {
       pins[3][pin] = pins[3][pin] + pins[1][pin];
       houseLights[3][houseLine] = houseLights[3][houseLine] - houseLights[1][houseLine];
-      //catch if above 255 (full PWM signal)
       if (pins[3][pin] > 255) {
         pins[3][pin] = 255;
       }
@@ -349,7 +357,6 @@ void pinFader(int pin, int value, int houseLine, int value2) {
     do {
       pins[3][pin] = pins[3][pin] + pins[1][pin];
       houseLights[3][houseLine] = houseLights[3][houseLine] + houseLights[1][houseLine];
-      //catch if above 255 (full PWM signal)
       if (pins[3][pin] > 255) {
         pins[3][pin] = 255;
       }
@@ -367,7 +374,6 @@ void pinFader(int pin, int value, int houseLine, int value2) {
     do {
       pins[3][pin] = pins[3][pin] - pins[1][pin];
       houseLights[3][houseLine] = houseLights[3][houseLine] - houseLights[1][houseLine];
-      //catch if above 255 (full PWM signal)
       if (pins[3][pin] < 0) {
         pins[3][pin] = 0;
       }
@@ -404,7 +410,7 @@ void loop() {
   }
   if (buttonPress == 1 && buttonPress2 == 0) {
     fountain();
-    Serial.println("Toggleing fountain");
+    Serial.println("Toggling fountain");
     buttonPress = 0;
   }
   if (buttonPress2 == 1 && buttonPress == 0) {
@@ -450,18 +456,12 @@ void loop() {
     //case 0 sets both strips to one selectable color
     case 0:
       rGBSolid(0);
-      housePhase = 0;
+    //  housePhase = 1;
+    //  aHouseLighting();
       rAD();
       break;
     //will be changed for Christmas setup with a fountain and only one LED strip
     case 1:
-      speedStrip();
-      if (ssdelay == 1) {}
-      if (ssdelay == 2) {}
-      //pins did not set value when this was in function above. put it here to fix
-      analogWrite(houseLights[0][1], houseLights[3][1]);
-      analogWrite(houseLights[0][2], houseLights[3][2]);
-      analogWrite(houseLights[0][3], houseLights[3][3]);
       rAD();
       break;
     //case two and three are not used yet
@@ -523,6 +523,12 @@ void loop() {
       rAD();
       break;
     case 7:
+      analogWrite(10, 255);
+      analogWrite(5, 0);
+      analogWrite(9, 255);
+      analogWrite(6, 0);
+      analogWrite(11, 255);
+      analogWrite(3, 0);
       break;
     default:
       rAD();
