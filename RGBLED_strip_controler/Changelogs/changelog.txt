@@ -61,6 +61,7 @@ adjusted behavior from pressing button 2 adjusted all modes to accomidate One RG
 Switched main loop to use switch/case
 Adjusting behavior of LED String
 Added aHouseLighting() and housePhase for easier control of LED String (in progress)
+Added pinFaderB to fix issues in mode 0
 Removed houseLighting()
 Reactivated interupt from pin D2 so as to test functionality during operation
 Removed extra white space
