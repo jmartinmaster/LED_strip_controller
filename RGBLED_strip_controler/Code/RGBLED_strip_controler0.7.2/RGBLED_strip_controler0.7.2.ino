@@ -192,10 +192,19 @@ void rAD() {
 void aHouseLighting() {
   switch (housePhase) {
     case 1:
+      pinFader(0,0,1,255);     
+      pinFader(0,0,2,0);     
+      pinFader(0,0,3,0);     
       break;
     case 2:
+      pinFader(0,0,1,0);     
+      pinFader(0,0,2,255);     
+      pinFader(0,0,3,0);     
       break;
     case 3:
+      pinFader(0,0,1,0);     
+      pinFader(0,0,2,0);     
+      pinFader(0,0,3,255);     
       break;
     case 4:
       //all off
@@ -203,38 +212,11 @@ void aHouseLighting() {
       analogWrite(5,0);
       analogWrite(6,0);
       break;
-  }
-}
-void houseLighting( int pin, int value) {
-  /*used to control the lights in the houses
-    The lights are bi-directional so there are three outputs
-    Having one line on will activate the other half the lights
-    house lights are on pins 3,5,6
-    equivalant to pins2[0][1-3]
-  */
-  if (houseLights[3][pin] < value) {
-    do {
-      houseLights[3][pin] = houseLights[3][pin] + houseLights[1][pin];
-      if (houseLights[3][pin] > 255) {
-        houseLights[3][pin] = 255;
-      }
-      analogWrite(houseLights[0][pin], houseLights[3][pin]);
-      speedStrip();
-      delay(ssdelay);
-    }
-    while (houseLights[3][pin] < value);
-  }
-  if (houseLights[3][pin] > value) {
-    do {
-      houseLights[3][pin] = houseLights[3][pin] - houseLights[1][pin];
-      if (houseLights[3][pin] < 0 ) {
-        houseLights[3][pin] = 0;
-      }
-      analogWrite(houseLights[0][pin], houseLights[3][pin]);
-      speedStrip();
-      delay(ssdelay);
-    }
-    while (houseLights[3][pin] > value);
+    case 5:
+      pinFader(0,0,1,255);     
+      pinFader(0,0,2,0);     
+      pinFader(0,0,3,255);  
+      break;
   }
   /*
     The nex if statements watch for invalid pin settings
@@ -468,6 +450,7 @@ void loop() {
     //case 0 sets both strips to one selectable color
     case 0:
       rGBSolid(0);
+      housePhase = 0;
       rAD();
       break;
     //will be changed for Christmas setup with a fountain and only one LED strip
