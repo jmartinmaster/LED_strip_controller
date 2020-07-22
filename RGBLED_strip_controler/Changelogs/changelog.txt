@@ -60,7 +60,7 @@ adjusted behavior from pressing button 2 adjusted all modes to accomidate One RG
 0.7.2
 Switched main loop to use switch/case
 Adjusting behavior of LED String
-Added aHouseLighing() for automatic fading of house lights in case 0(Single color for LED strip)
+Added aHouseLighing() and housePhase for easier control of LED String (in progress)
 Removed houseLighting()
 Reactivated interupt from pin D2 so as to test functionality during operation
 Removed extra white space
