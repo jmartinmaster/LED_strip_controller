@@ -27,6 +27,8 @@ volatile int buttonPress2 = 0;
 int fountinpin = 13;
 //Variable to track houseLights
 int housePhase = 0;
+//temporay var for debugging pinFade()
+int loopN = 0;
 void setup() {
   //assign pin numbers
   pins[0][1] = 9;
@@ -192,19 +194,32 @@ void rAD() {
 void aHouseLighting() {
   switch (housePhase) {
     case 1:
-      pinFader(0,0,1,255);     
-      pinFader(0,255,2,0);     
-      pinFader(0,0,3,0);
-      pinFader(0,255,1,0);     
-      pinFader(0,255,2,0);     
-      pinFader(0,0,3,255);
-      pinFader(0,255,1,0);  
-      pinFader(0,0,2,255);     
-      pinFader(0,255,3,0);
-      pinFader(0,0,2,0); 
-      pinFader(0,255,1,255);     
-      pinFader(0,0,2,0);     
-      pinFader(0,255,3,255);
+      pinFaderB(1,255);
+      Serial.println("1 complete"); 
+      pinFaderB(2,0);  
+      Serial.println("2 complete");  
+      pinFaderB(3,0);
+      Serial.println("3 complete");
+      pinFaderB(1,0);     
+      Serial.println("4 complete");
+      pinFaderB(2,0);     
+      Serial.println("5 complete");
+      pinFaderB(3,255);
+      Serial.println("6 complete");
+      pinFaderB(1,0);  
+      Serial.println("7 complete");
+      pinFaderB(2,255);     
+      Serial.println("8 complete");
+      pinFaderB(3,0);
+      Serial.println("9 complete");
+      pinFaderB(2,0); 
+      Serial.println("10 complete");
+      pinFaderB(1,255);     
+      Serial.println("11 complete");
+      pinFaderB(2,0);     
+      Serial.println("12 complete");
+      pinFaderB(3,255);
+      Serial.println("13 complete");
       break;
     case 2:
       pinFader(0,0,1,0);     
@@ -231,7 +246,7 @@ void aHouseLighting() {
   /*
     The nex if statements watch for invalid pin settings
     If two are at full value the remaining one is turned off.
-  */
+  
   if (houseLights[3][0] > 254 && houseLights[3][1] > 254) {
     houseLights[3][2] = 0;
     analogWrite(houseLights[0][2], houseLights[3][2]);
@@ -244,6 +259,7 @@ void aHouseLighting() {
     houseLights[3][1] = 0;
     analogWrite(houseLights[0][1], houseLights[3][1]);
   }
+  */
 }
 //Controls the TIP120 connected to the fountain. value is on or off.
 void fountain() {
@@ -256,7 +272,6 @@ void fountain() {
 }
 //holds a single color for both strips
 void rGBSolid(int cycleNumber) {
-  aHouseLighting();
   //sets values to max value so everything has a base starting point
   //cycle number is used once per call to set everything to be the same
   if (cycleNumber == 0) {
@@ -319,7 +334,10 @@ void rGBSolid(int cycleNumber) {
 //used to fade the pins smoothly instead of a "hard" switch
 //when calling pinfader if house lights or LED strip is to remain the same call with 0,0,#,# to not change anything
 void pinFader(int pin, int value, int houseLine, int value2) {
+  loopN=0;
+  
   if (pins[3][pin] > value && houseLights[3][houseLine] < value2) {
+    
     do {
       pins[3][pin] = pins[3][pin] - pins[1][pin];
       houseLights[3][houseLine] = houseLights[3][houseLine] + houseLights[1][houseLine];
@@ -333,6 +351,8 @@ void pinFader(int pin, int value, int houseLine, int value2) {
       analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
       speedStrip();
       delay(ssdelay);
+      if(loopN > 258){break;};
+      loopN++;
     }
     while (pins[3][pin] > value || houseLights[3][houseLine] < value);
   }
@@ -350,6 +370,8 @@ void pinFader(int pin, int value, int houseLine, int value2) {
       analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
       speedStrip();
       delay(ssdelay);
+      if(loopN > 258){break;};
+      loopN++;
     }
     while (pins[3][pin] < value || houseLights[3][houseLine] > value);
   }
@@ -367,6 +389,8 @@ void pinFader(int pin, int value, int houseLine, int value2) {
       analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
       speedStrip();
       delay(ssdelay);
+      if(loopN > 258){break;};
+      loopN++;
     }
     while (pins[3][pin] < value || houseLights[3][houseLine] < value);
   }
@@ -384,8 +408,37 @@ void pinFader(int pin, int value, int houseLine, int value2) {
       analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
       speedStrip();
       delay(ssdelay);
+      if(loopN > 258){break;};
+      loopN++;
     }
     while (pins[3][pin] < value || houseLights[3][houseLine] < value);
+  }
+}
+//basic pin fader for use with mode 0
+void pinFaderB(int houseLine, int value) {
+  if (houseLights[3][houseLine] < value) {
+    do {
+      houseLights[3][houseLine] = houseLights[3][houseLine] + houseLights[1][houseLine];
+      if (houseLights[3][houseLine] > 255) {
+        houseLights[3][houseLine] = 255;
+      }
+      analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
+      speedStrip();
+      delay(ssdelay/2);
+      rGBSolid(0);
+    } while (houseLights[3][houseLine] < value);
+  }
+  if (houseLights[3][houseLine] > value) {
+    do {
+     houseLights[3][houseLine] = houseLights[3][houseLine] - houseLights[1][houseLine];
+      if (houseLights[3][houseLine] < 0 ) {
+        houseLights[3][houseLine] = 0;
+      }
+      analogWrite(houseLights[0][houseLine], houseLights[3][houseLine]);
+      speedStrip();
+      delay(ssdelay/2);
+      rGBSolid(0);
+    } while (houseLights[3][houseLine] > value);
   }
 }
 //this is the interupt function called by D2 when signal is received
@@ -405,6 +458,7 @@ void interFunction() {
 //Main loop to chose mode behavor
 //speedStrip is called often to set the speed at any given point
 void loop() {
+  loopN=0;
   if (mode != 7) {
     rAD();
   }
@@ -455,9 +509,8 @@ void loop() {
   switch (mode) {
     //case 0 sets both strips to one selectable color
     case 0:
-      rGBSolid(0);
-    //  housePhase = 1;
-    //  aHouseLighting();
+      housePhase = 1;
+      aHouseLighting();
       rAD();
       break;
     //will be changed for Christmas setup with a fountain and only one LED strip
