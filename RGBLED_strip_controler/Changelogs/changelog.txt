@@ -65,3 +65,6 @@ Added pinFaderB to fix issues in mode 0
 Removed houseLighting()
 Reactivated interupt from pin D2 so as to test functionality during operation
 Removed extra white space
+0.7.4
+Added a brightness adjuster for modes 4 and 6
+finalising tweeks for controller
