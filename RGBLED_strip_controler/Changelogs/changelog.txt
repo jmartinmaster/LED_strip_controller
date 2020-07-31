@@ -19,45 +19,45 @@ added functions
 	-pinSet()
 	-printAnalog()
 	-loop()
-0.1
+01
 changed pfade[] to pinFV[]
 changed pdelay[] to pinDelay[]
 changed pvalue[] to pinV[]
 Adjusted loop behavior
-0.2
+02
 pins[], pinFV[], pinV[], pinDelay[] moved to pins[][];
 changed readAnalogDecode() to rAD();
 altered the rainbow (mode 0) if(){} statement;
-0.3
+03
 Setup a catch method
 Setup analogAverage(aA(){})
 Setup additional analog input for delays/speed control
-0.4
+04
 pinFader(){} Now supports mode 5 Split rainbow
 setup speedStrip() for speed select / atrip select
 removed cob()
-0.5
+05
 adjusted speedStrip()
 split RGBSolidSeperate into RGBSolidSeperateOne() and RGBSolidSeperateTwo
 	-funtion was not working when trying to control both strips at the same time
 adjusted loop()
-0.6
+06
 added pinFaderM5() due to issues fading pins in mode 5
 removed unused Serial.print methods
-0.6.1
+0601
 changed int mode to volatile int mode for use in interupt
 added interupt from pin 2
 added interFunction() for use when pin two receives a HIGH signal
 commented out modes 2 and 3 in loop and rAD()as they are not used
 added anotations
-0.6.2
+0602
 added int fountinpin = 13
 added houseLights(int pin, int value)
 added fountain() for on/off control of a water fountain attached to pin 13
-0.7
+07
 adjusted values for houseLights
 adjusted behavior from pressing button 2 adjusted all modes to accomidate One RGBLed strip, one bi-directional LED String and a fountian
-0.7.2
+0702
 Switched main loop to use switch/case
 Adjusting behavior of LED String
 Added aHouseLighting() and housePhase for easier control of LED String (in progress)
@@ -65,6 +65,6 @@ Added pinFaderB to fix issues in mode 0
 Removed houseLighting()
 Reactivated interupt from pin D2 so as to test functionality during operation
 Removed extra white space
-0.7.4
+0704
 Added a brightness adjuster for modes 4 and 6
 finalising tweeks for controller
